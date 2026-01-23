@@ -10,10 +10,14 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<name>Explore With Me</name>
 
-	<groupId>ru.practicum</groupId>
-	<artifactId>explore-with-me</artifactId>
+    <modules>
+        <module>main-service</module>
+		<module>stat-service</module>
+	</modules>
+
+    <groupId>ru.practicum</groupId>
+	<artifactId>share-time-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
