@@ -16,24 +16,4 @@ services:
       interval: 5s
       retries: 10
 
-  stats-server:
-    image: stats-server
-    container_name: stats-server
-    ports:
-      - "8080:8080"
-    depends_on:
-      # указываем, что этот сервис зависит от сервиса с именем stats-db
-      stats-db:
-        # указываем, что условием запуска будет момент, когда
-        # сервис stats-db будет в «здоровом» состоянии
-        condition: service_healthy
-    environment:
-      DATABASE_URL: jdbc:postgresql://stats-db:5432/stats
-      DATABASE_USER_NAME: dbuser
-      DATABASE_PASSWORD: 12345
 
-  ewm-service:
-    image: ewm-service
-    container_name: ewm-service
-    ports:
-      - "9091:9090"
