@@ -31,3 +31,9 @@ services:
       DATABASE_URL: jdbc:postgresql://stats-db:5432/stats
       DATABASE_USER_NAME: dbuser
       DATABASE_PASSWORD: 12345
+
+  ewm-service:
+    image: ewm-service
+    container_name: ewm-service
+    ports:
+      - "9090:8080"
