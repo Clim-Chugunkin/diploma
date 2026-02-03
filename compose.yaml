@@ -35,9 +35,9 @@ services:
       DATABASE_PASSWORD: 12345
 
   ewm-service:
-    image: ewm-service
     build:
       context: main-service
       dockerfile: Dockerfile
+    container_name: ewm-service
     ports:
       - "9090:9090"
