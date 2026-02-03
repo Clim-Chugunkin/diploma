@@ -32,4 +32,8 @@ services:
       DATABASE_USER_NAME: dbuser
       DATABASE_PASSWORD: 12345
 
-
+  ewm-service:
+    image: ewm-service
+    container_name: ewm-service
+    ports:
+      - "9091:9091"
