@@ -36,4 +36,4 @@ services:
     image: ewm-service
     container_name: ewm-service
     ports:
-      - "9091:9091"
+      - "9090:9090"
