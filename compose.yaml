@@ -41,3 +41,4 @@ services:
     container_name: ewm-service
     ports:
       - "8080:9090"
+
