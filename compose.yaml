@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile
     container_name: stats-server
     ports:
-      - "8080:8080"
+      - "9090:8080"
     depends_on:
       # указываем, что этот сервис зависит от сервиса с именем stats-db
       stats-db:
@@ -40,4 +40,4 @@ services:
       dockerfile: Dockerfile
     container_name: ewm-service
     ports:
-      - "9090:9090"
+      - "8080:9090"
