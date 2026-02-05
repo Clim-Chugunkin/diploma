@@ -18,7 +18,7 @@ services:
 
   stats-server:
     build:
-      context: stat-service/service
+      context: stats/service
       dockerfile: Dockerfile
     container_name: stats-server
     ports:
@@ -36,7 +36,7 @@ services:
 
   ewm-service:
     build:
-      context: main-service
+      context: main-server
       dockerfile: Dockerfile
     container_name: ewm-service
     ports:
