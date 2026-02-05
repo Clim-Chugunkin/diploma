@@ -10,8 +10,8 @@
 	</parent>
 
     <modules>
-        <module>main-service</module>
-		<module>stat-service</module>
+        <module>main-server</module>
+		<module>stats</module>
 	</modules>
 
     <groupId>ru.practicum</groupId>
