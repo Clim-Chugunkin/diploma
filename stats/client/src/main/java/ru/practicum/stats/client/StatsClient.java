@@ -16,11 +16,7 @@ public class StatsClient extends BaseClient {
     private final String serverUrl;
 
     public StatsClient(String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder
-                        .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
-                        .build()
-        );
+        super(builder.requestFactory(() -> new HttpComponentsClientHttpRequestFactory()).build());
         this.serverUrl = serverUrl;
     }
 
