@@ -1,0 +1,63 @@
+services:
+  stats-db:
+    image: postgres:16.1
+    container_name: postgres
+    ports:
+      - "4000:5432"
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=stats
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  stats-server:
+    build:
+      context: stats/service
+      dockerfile: Dockerfile
+    container_name: stats-server
+    ports:
+      - "9090:8080"
+    depends_on:
+      # указываем, что этот сервис зависит от сервиса с именем stats-db
+      stats-db:
+        # указываем, что условием запуска будет момент, когда
+        # сервис stats-db будет в «здоровом» состоянии
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://stats-db:5432/stats
+      DATABASE_USER_NAME: dbuser
+      DATABASE_PASSWORD: 12345
+
+  ewm-service:
+    build:
+      context: main-server
+      dockerfile: Dockerfile
+    container_name: ewm-service
+    ports:
+      - "8080:9090"
+    depends_on:
+      ewm-db:
+        condition: service_healthy
+
+  ewm-db:
+    image: postgres:16.1
+    container_name: postgres_ewm
+    ports:
+      - "4001:5432"
+    volumes:
+      - ./volumes/postgres_ewm:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=ewm_db
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
