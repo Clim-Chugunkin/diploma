@@ -131,7 +131,7 @@ public class EventServiceImpl implements EventService {
         }
         if (updatedEvent.getStateAction() == StateAction.REJECT_EVENT) {
             //событие можно отклонить, только если оно еще не опубликовано
-            if (event.getState() != State.PUBLISHED) {
+            if (event.getState() == State.PUBLISHED) {
                 throw new InvalidDateException("событие можно отклонить, только если оно еще не опубликовано");
             }
             event.setState(State.CANCELED);

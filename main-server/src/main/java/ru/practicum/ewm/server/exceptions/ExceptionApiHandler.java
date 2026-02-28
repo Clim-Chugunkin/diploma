@@ -58,10 +58,10 @@ public class ExceptionApiHandler {
     }
 
     @ExceptionHandler(InvalidDateException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleInvalidDateException(InvalidDateException ex) {
         log.error(ex.getMessage());
-        return new ErrorMessage(HttpStatus.FORBIDDEN.toString(),
+        return new ErrorMessage(HttpStatus.BAD_REQUEST.toString(),
                 "For the requested operation the conditions are not met", ex.getMessage(), LocalDateTime.now());
     }
 }
