@@ -11,6 +11,7 @@ import ru.practicum.ewm.server.exceptions.ConflictException;
 import ru.practicum.ewm.server.utils.OffsetLimitRequest;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -43,8 +44,11 @@ public class CategoryServiceImpl implements CategoryService {
         //check if exists
         categoryRepository.findById(category.getId()).orElseThrow(() -> new ConditionsNotMetException("категория с id = " + category.getId() + " не существует"));
         //check if category with this name exists
-        if (categoryRepository.findByName(category.getName()).isPresent()) {
-            throw new ConflictException("категория с таким именем уже есть");
+        Category temp = categoryRepository.findByName(category.getName()).orElse(null);
+        if (temp != null) {
+            //if the name being changed is the same
+            if (!Objects.equals(category.getId(), temp.getId()))
+                throw new ConflictException("категория с таким именем уже есть");
         }
         return categoryRepository.save(category);
     }

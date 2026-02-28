@@ -1,5 +1,6 @@
 package ru.practicum.ewm.server.event.DTO;
 
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import ru.practicum.ewm.server.event.model.Location;
 import ru.practicum.ewm.server.event.model.StateAction;
@@ -12,6 +13,7 @@ public class UpdateEventUserRequest {
     private String eventDate;
     private Location location;
     private Boolean paid;
+    @Positive(message = "лимит участников должен быть положительным")
     private Integer participantLimit;
     private Boolean requestModeration;
     private StateAction stateAction;

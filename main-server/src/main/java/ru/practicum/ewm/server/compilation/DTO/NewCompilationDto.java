@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 public class NewCompilationDto {
     private Set<Long> events;
-    @NotNull(message = "не указан pinned ")
+    @NotNull(message = "не указан pinned")
     private Boolean pinned;
     @NotNull(message = "не указан заголовок")
     @NotBlank(message = "заголовок не может быть пустым")

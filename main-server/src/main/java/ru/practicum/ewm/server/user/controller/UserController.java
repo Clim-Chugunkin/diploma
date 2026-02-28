@@ -26,8 +26,8 @@ public class UserController {
     @GetMapping
     public List<UserDto> getUsers(@RequestParam(required = false) String[] ids,
                                   @RequestParam(defaultValue = "0") int from,
-                                  @RequestParam(defaultValue = "10") int limit) {
-        return userService.getUsers(ids, from, limit).stream()
+                                  @RequestParam(defaultValue = "10") int size) {
+        return userService.getUsers(ids, from, size).stream()
                 .map(UserMapper::fromUserToUserDto)
                 .toList();
     }

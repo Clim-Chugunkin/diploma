@@ -23,6 +23,7 @@ public class NewEventDto {
     @Valid
     private Location location;
     private Boolean paid;
+    @Positive(message = "лимит участников должен быть положительным")
     private Integer participantLimit;
     private Boolean requestModeration;
     @NotNull(message = "не указана поле title события")
