@@ -13,6 +13,7 @@ import ru.practicum.ewm.server.event.model.Event;
 import ru.practicum.ewm.server.event.repository.EventRepository;
 import ru.practicum.ewm.server.exceptions.ConditionsNotMetException;
 import ru.practicum.ewm.server.exceptions.ConflictException;
+import ru.practicum.ewm.server.exceptions.InvalidArgumentException;
 import ru.practicum.ewm.server.utils.OffsetLimitRequest;
 
 import java.util.HashSet;
@@ -28,6 +29,8 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
+        if (newCompilationDto.getEvents() == null) newCompilationDto.setEvents(Set.of());
+
         //check that all events exists
         List<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
         Set<Long> unExistedEvents = new HashSet<>(newCompilationDto.getEvents());
@@ -50,6 +53,11 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto updateCompilation(Long compId, NewCompilationDto compilationDto) {
+
+        if (compilationDto.getTitle().length()>50) {
+            throw new InvalidArgumentException("title должно быть от 1 до 50 символов");
+        }
+
         //check if compilation exists
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new ConditionsNotMetException("Подборки с id = " + compId + "нет"));
         //check if new events exists

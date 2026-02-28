@@ -145,20 +145,20 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> findEvents(FilterDto filter) {
         Pageable offsetLimitRequest = new OffsetLimitRequest(filter.getFrom(), filter.getSize());
-        return eventRepository.findEvents(filter.getUsers(), filter.getStates(),
-                        filter.getCategories(), filter.getStart(), filter.getEnd(), offsetLimitRequest).stream()
-                .map(EventMapper::fromEventToFullEvent)
-                .toList();
+        return eventRepository.findEventsByAdmin(filter.getUsers(), filter.getStates(),
+                        filter.getCategories(), filter.getStart(), filter.getEnd(), Status.CONFIRMED, offsetLimitRequest);
+
     }
 
     @Override
     public List<EventShortDto> findEventsWithFilters(FilterDto filterDto, String ip, String uri) {
-        StatsHitDTO endpoint = new StatsHitDTO();
-        endpoint.setIp(ip);
-        endpoint.setApp("ewm-main-service");
-        endpoint.setUri(uri);
-        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
-        statsClient.addEndpoint(endpoint);
+//        StatsHitDTO endpoint = new StatsHitDTO();
+//        endpoint.setIp(ip);
+//        endpoint.setApp("ewm-main-service");
+//        endpoint.setUri(uri);
+//        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
+//        statsClient.addEndpoint(endpoint);
+        System.out.println(filterDto.getStart());
         Pageable offsetLimitRequest = new OffsetLimitRequest(filterDto.getFrom(), filterDto.getSize());
         List<EventShortDto> list = eventRepository.getAllWithFilters(filterDto.getText(),
                 filterDto.getCategories(),

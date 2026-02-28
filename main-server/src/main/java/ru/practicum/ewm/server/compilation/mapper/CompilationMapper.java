@@ -7,7 +7,7 @@ import ru.practicum.ewm.server.compilation.model.Compilation;
 public class CompilationMapper {
     public static Compilation fromCompilationDtoToCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = new Compilation();
-        //compilation.setEvents(newCompilationDto.getEvents());
+        compilation.setEvents(newCompilationDto.getEvents());
         compilation.setPinned(newCompilationDto.getPinned());
         compilation.setTitle(newCompilationDto.getTitle());
         return compilation;
@@ -23,7 +23,7 @@ public class CompilationMapper {
 
     public static Compilation joinCompilationWithDto(Compilation compilation, NewCompilationDto compilationDto) {
         if (compilationDto.getEvents() != null) {
-            //compilation.setEvents(compilationDto.getEvents());
+            compilation.setEvents(compilationDto.getEvents());
         }
         if (compilationDto.getPinned() != null) {
             compilation.setPinned(compilationDto.getPinned());

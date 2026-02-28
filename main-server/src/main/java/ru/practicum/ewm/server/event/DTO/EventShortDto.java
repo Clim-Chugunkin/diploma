@@ -17,7 +17,7 @@ public class EventShortDto {
     private Long id;
     private String annotation;
     private CategoryDto category;
-    private Long confirmedRequest;
+    private Long confirmedRequests;
     private String eventDate;
     private UserShortDto initiator;
     private Boolean paid;
@@ -27,7 +27,7 @@ public class EventShortDto {
     public EventShortDto(Event event, Long confirmedRequest) {
         this.id = event.getId();
         this.annotation = event.getAnnotation();
-        this.confirmedRequest = confirmedRequest;
+        this.confirmedRequests = confirmedRequest;
         this.category = CategoryMapper.fromCategoryToCategoryDto(event.getCategory());
         this.eventDate = event.getEventDate().format(formatter);
         this.initiator = UserMapper.fromUserToUserShortDto(event.getInitiator());
