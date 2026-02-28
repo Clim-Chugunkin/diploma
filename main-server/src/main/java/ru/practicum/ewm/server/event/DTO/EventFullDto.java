@@ -31,6 +31,7 @@ public class EventFullDto {
     private String title;
     private State state;
     private Long views;
+
     public EventFullDto(Event event, Long confirmedRequest) {
         this.id = event.getId();
         this.annotation = event.getAnnotation();
@@ -40,7 +41,7 @@ public class EventFullDto {
         this.description = event.getDescription();
         this.eventDate = event.getEventDate().format(formatter);
         this.initiator = UserMapper.fromUserToUserShortDto(event.getInitiator());
-        this.location = new Location(event.getLat(),event.getLon());
+        this.location = new Location(event.getLat(), event.getLon());
         this.paid = event.getPaid();
         this.participantLimit = event.getParticipantLimit();
         this.publishedOn = event.getPublishedOn().format(formatter);

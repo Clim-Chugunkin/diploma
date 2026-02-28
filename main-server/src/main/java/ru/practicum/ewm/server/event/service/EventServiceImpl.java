@@ -146,7 +146,7 @@ public class EventServiceImpl implements EventService {
     public List<EventFullDto> findEvents(FilterDto filter) {
         Pageable offsetLimitRequest = new OffsetLimitRequest(filter.getFrom(), filter.getSize());
         return eventRepository.findEventsByAdmin(filter.getUsers(), filter.getStates(),
-                        filter.getCategories(), filter.getStart(), filter.getEnd(), Status.CONFIRMED, offsetLimitRequest);
+                filter.getCategories(), filter.getStart(), filter.getEnd(), Status.CONFIRMED, offsetLimitRequest);
 
     }
 
