@@ -44,6 +44,11 @@ services:
     depends_on:
       ewm-db:
         condition: service_healthy
+    environment:
+      STATS_SERVER_URL: http://stats-server:8080
+      DATABASE_URL: jdbc:postgresql://ewm-db:5432/ewm_db
+      DATABASE_USER_NAME: dbuser
+      DATABASE_PASSWORD: 12345
 
   ewm-db:
     image: postgres:16.1
