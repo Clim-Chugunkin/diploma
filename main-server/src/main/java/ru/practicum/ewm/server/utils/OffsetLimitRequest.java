@@ -35,22 +35,22 @@ public class OffsetLimitRequest implements Pageable {
 
     @Override
     public Pageable next() {
-        return null;
+        return this;
     }
 
     @Override
     public Pageable previousOrFirst() {
-        return null;
+        return this;
     }
 
     @Override
     public Pageable first() {
-        return null;
+        return this;
     }
 
     @Override
     public Pageable withPage(int pageNumber) {
-        return null;
+        return this;
     }
 
     @Override
