@@ -44,7 +44,11 @@ public class RequestServiceImpl implements RequestService {
         //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
-        request.setStatus(Status.PENDING);
+        if (event.getParticipantLimit() == 0) {
+            request.setStatus(Status.CONFIRMED);
+        } else {
+            request.setStatus(Status.PENDING);
+        }
         request.setRequestor(userId);
         request.setEvent(eventId);
         return RequestMapper.fromRequestToRequestDto(requestRepository.save(request));
@@ -101,7 +105,7 @@ public class RequestServiceImpl implements RequestService {
             return result;
         }
         //get all confirmed request of event
-        Long count = requestRepository.getAllRequest(eventId, ru.practicum.ewm.server.request.DTO.Status.CONFIRMED.toString());
+        Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
         //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         if (event.getParticipantLimit() - count <= 0) {
             throw new InvalidDateException("достигнут лимит по заявкам на данное событие");

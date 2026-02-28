@@ -3,6 +3,7 @@ package ru.practicum.ewm.server.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -60,6 +61,14 @@ public class ExceptionApiHandler {
     @ExceptionHandler(InvalidDateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleInvalidDateException(InvalidDateException ex) {
+        log.error(ex.getMessage());
+        return new ErrorMessage(HttpStatus.BAD_REQUEST.toString(),
+                "For the requested operation the conditions are not met", ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage handleMissingParams(MissingServletRequestParameterException ex) {
         log.error(ex.getMessage());
         return new ErrorMessage(HttpStatus.BAD_REQUEST.toString(),
                 "For the requested operation the conditions are not met", ex.getMessage(), LocalDateTime.now());

@@ -13,7 +13,7 @@ public class RequestMapper {
         requestDto.setId(request.getId());
         requestDto.setEvent(request.getEvent());
         requestDto.setCreated(request.getCreated().format(formatter));
-        requestDto.setRequestor(request.getRequestor());
+        requestDto.setRequester(request.getRequestor());
         requestDto.setStatus(request.getStatus());
         return requestDto;
     }

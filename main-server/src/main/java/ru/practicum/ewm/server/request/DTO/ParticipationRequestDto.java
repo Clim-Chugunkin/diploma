@@ -8,6 +8,6 @@ public class ParticipationRequestDto {
     private Long id;
     private String created;
     private Long event;
-    private Long requestor;
+    private Long requester;
     private Status status;
 }
