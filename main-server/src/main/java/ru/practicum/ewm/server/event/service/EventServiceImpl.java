@@ -197,7 +197,7 @@ public class EventServiceImpl implements EventService {
         endpoint.setTimestamp(LocalDateTime.now().format(formatter));
         statsClient.addEndpoint(endpoint);
         LocalDateTime now = LocalDateTime.now();
-        List<ViewStats> stats = statsClient.getStatistic(now.minusDays(1).format(formatter), now.format(formatter), new String[]{uri}, true);
+        List<ViewStats> stats = statsClient.getStatistic(now.minusDays(1).format(formatter), now.plusDays(1).format(formatter), new String[]{uri}, true);
         Long views = stats.stream()
                 .filter(it -> it.getUri().equals(uri))
                 .map(ViewStats::getHits)
