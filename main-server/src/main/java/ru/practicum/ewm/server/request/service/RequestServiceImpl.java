@@ -49,10 +49,10 @@ public class RequestServiceImpl implements RequestService {
         }
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
-        if (event.getParticipantLimit() == 0) {
-            request.setStatus(Status.CONFIRMED);
-        } else {
+        if (event.getRequestModeration()) {
             request.setStatus(Status.PENDING);
+        } else {
+            request.setStatus(Status.CONFIRMED);
         }
         //если пользователь уже создал запрос на событие
         if (requestRepository.countByEventAndRequestor(eventId, userId) != 0) {
@@ -114,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
             return result;
         }
         //get all confirmed request of event
-        Long count = requestRepository.getAllRequest(eventId,Status.CONFIRMED);
+        Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
         //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         if (event.getParticipantLimit() - count <= 0) {
             throw new ConflictException("достигнут лимит по заявкам на данное событие");

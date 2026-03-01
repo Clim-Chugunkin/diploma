@@ -154,6 +154,10 @@ public class EventServiceImpl implements EventService {
 //        endpoint.setUri(uri);
 //        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
 //        statsClient.addEndpoint(endpoint);
+        //проверка валидации
+        if (filterDto.getStart().isAfter(filterDto.getEnd())) {
+            throw new InvalidDateException("дата начала не должна быть позже даты конца");
+        }
         System.out.println(filterDto.getStart());
         Pageable offsetLimitRequest = new OffsetLimitRequest(filterDto.getFrom(), filterDto.getSize());
         List<EventShortDto> list = eventRepository.getAllWithFilters(filterDto.getText(),
