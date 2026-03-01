@@ -18,12 +18,16 @@ import ru.practicum.ewm.server.request.model.Status;
 import ru.practicum.ewm.server.user.model.User;
 import ru.practicum.ewm.server.user.repository.UserRepository;
 import ru.practicum.ewm.server.utils.OffsetLimitRequest;
+import ru.practicum.stats.DTO.StatsHitDTO;
+import ru.practicum.stats.DTO.ViewStats;
 import ru.practicum.stats.client.StatsClient;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import static ru.practicum.ewm.server.utils.DateTimeFormat.formatter;
 
 @Service
 @RequiredArgsConstructor
@@ -148,12 +152,12 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> findEventsWithFilters(FilterDto filterDto, String ip, String uri) {
-//        StatsHitDTO endpoint = new StatsHitDTO();
-//        endpoint.setIp(ip);
-//        endpoint.setApp("ewm-main-service");
-//        endpoint.setUri(uri);
-//        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
-//        statsClient.addEndpoint(endpoint);
+        StatsHitDTO endpoint = new StatsHitDTO();
+        endpoint.setIp(ip);
+        endpoint.setApp("ewm-main-service");
+        endpoint.setUri(uri);
+        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
+        statsClient.addEndpoint(endpoint);
         //проверка валидации
         if ((filterDto.getStart() != null) && (filterDto.getEnd() != null)) {
             if (filterDto.getStart().isAfter(filterDto.getEnd())) {
@@ -186,23 +190,23 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getEventById(Long id, String ip, String uri) {
-//        StatsHitDTO endpoint = new StatsHitDTO();
-//        endpoint.setIp(ip);
-//        endpoint.setApp("ewm-main-service");
-//        endpoint.setUri(uri);
-//        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
-//        statsClient.addEndpoint(endpoint);
-//        LocalDateTime now = LocalDateTime.now();
-//        List<ViewStats> stats = statsClient.getStatistic(now.minusDays(1).format(formatter), now.format(formatter), new String[]{uri}, false);
-//        Long views = stats.stream()
-//                .filter(it -> it.getUri().equals(uri))
-//                .map(ViewStats::getHits)
-//                .findFirst()
-//                .orElse(0L);
+        StatsHitDTO endpoint = new StatsHitDTO();
+        endpoint.setIp(ip);
+        endpoint.setApp("ewm-main-service");
+        endpoint.setUri(uri);
+        endpoint.setTimestamp(LocalDateTime.now().format(formatter));
+        statsClient.addEndpoint(endpoint);
+        LocalDateTime now = LocalDateTime.now();
+        List<ViewStats> stats = statsClient.getStatistic(now.minusDays(1).format(formatter), now.format(formatter), new String[]{uri}, true);
+        Long views = stats.stream()
+                .filter(it -> it.getUri().equals(uri))
+                .map(ViewStats::getHits)
+                .findFirst()
+                .orElse(0L);
 
         EventFullDto event = eventRepository.getEventById(id, Status.CONFIRMED, State.PUBLISHED)
                 .orElseThrow(() -> new ConditionsNotMetException("события с id = " + id + " нет или оно не опубликовано"));
-        //event.setViews(views);
+        event.setViews(views);
         return event;
     }
 }
