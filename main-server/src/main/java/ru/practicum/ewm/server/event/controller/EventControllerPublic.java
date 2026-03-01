@@ -3,6 +3,7 @@ package ru.practicum.ewm.server.event.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.server.event.DTO.EventFullDto;
 import ru.practicum.ewm.server.event.DTO.EventShortDto;
 import ru.practicum.ewm.server.event.DTO.FilterDto;
 import ru.practicum.ewm.server.event.service.EventService;
@@ -22,8 +23,8 @@ public class EventControllerPublic {
     }
 
     @GetMapping("/{id}")
-    public EventShortDto findById(@PathVariable Long id,
-                                  HttpServletRequest request) {
+    public EventFullDto findById(@PathVariable Long id,
+                                 HttpServletRequest request) {
         return eventService.getEventById(id, request.getRemoteAddr(), request.getRequestURI());
     }
 }

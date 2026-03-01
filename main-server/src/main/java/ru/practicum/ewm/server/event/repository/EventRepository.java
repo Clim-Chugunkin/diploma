@@ -57,13 +57,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                           @Param("available") Boolean available,
                                           @Param("status") Status status, Pageable pageable);
 
-    @Query("select new ru.practicum.ewm.server.event.DTO.EventShortDto(" +
+    @Query("select new ru.practicum.ewm.server.event.DTO.EventFullDto(" +
             "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it" +
             " where it.id = :id and " +
             "it.state = :state")
-    Optional<EventShortDto> getEventById(@Param("id") Long id,
-                                         @Param("status") Status status,
-                                         @Param("state") State state);
+    Optional<EventFullDto> getEventById(@Param("id") Long id,
+                                        @Param("status") Status status,
+                                        @Param("state") State state);
 
 
 }

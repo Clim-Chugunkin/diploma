@@ -19,6 +19,6 @@ public interface EventService {
 
     List<EventShortDto> findEventsWithFilters(FilterDto filterDto, String ip, String uri);
 
-    EventShortDto getEventById(Long id, String ip, String uri);
+    EventFullDto getEventById(Long id, String ip, String uri);
 
 }

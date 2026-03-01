@@ -43,8 +43,8 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("нельзя участвовать в неопубликованном событии");
         }
         //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
-        Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
-        if (event.getParticipantLimit() - count <= 0) {
+        Long count = requestRepository.getAllRequest(eventId);
+        if ((event.getParticipantLimit() != 0) && (event.getParticipantLimit() - count <= 0)) {
             throw new ConflictException("достигнут лимит по заявкам на данное событие");
         }
         Request request = new Request();
@@ -73,7 +73,7 @@ public class RequestServiceImpl implements RequestService {
         if (!userId.equals(request.getRequestor())) {
             throw new InvalidDateException("пользователь с id = " + userId + "не является создателем запроса с id " + requestId);
         }
-        request.setStatus(Status.CANCELED);
+        request.setStatus(Status.REJECTED);
         return RequestMapper.fromRequestToRequestDto(requestRepository.save(request));
     }
 
@@ -114,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
             return result;
         }
         //get all confirmed request of event
-        Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
+        Long count = requestRepository.getAllRequest(eventId);
         //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         if (event.getParticipantLimit() - count <= 0) {
             throw new ConflictException("достигнут лимит по заявкам на данное событие");
@@ -132,14 +132,14 @@ public class RequestServiceImpl implements RequestService {
                     requests.get(i).setStatus(Status.CONFIRMED);
                     result.getConfirmedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
                 } else {
-                    requests.get(i).setStatus(Status.CANCELED);
+                    requests.get(i).setStatus(Status.REJECTED);
                     result.getRejectedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
                 }
                 count++;
             }
         } else {
             for (int i = 0; i < requests.size(); i++) {
-                requests.get(i).setStatus(Status.CANCELED);
+                requests.get(i).setStatus(Status.REJECTED);
                 result.getRejectedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
             }
         }
