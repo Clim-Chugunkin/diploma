@@ -43,7 +43,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("нельзя участвовать в неопубликованном событии");
         }
         //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
-        Long count = requestRepository.getAllRequest(eventId);
+        Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
         if ((event.getParticipantLimit() != 0) && (event.getParticipantLimit() - count <= 0)) {
             throw new ConflictException("достигнут лимит по заявкам на данное событие");
         }
@@ -73,7 +73,7 @@ public class RequestServiceImpl implements RequestService {
         if (!userId.equals(request.getRequestor())) {
             throw new InvalidDateException("пользователь с id = " + userId + "не является создателем запроса с id " + requestId);
         }
-        request.setStatus(Status.REJECTED);
+        request.setStatus(Status.CANCELED);
         return RequestMapper.fromRequestToRequestDto(requestRepository.save(request));
     }
 
@@ -114,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
             return result;
         }
         //get all confirmed request of event
-        Long count = requestRepository.getAllRequest(eventId);
+        Long count = requestRepository.getAllRequest(eventId,Status.CONFIRMED);
         //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         if (event.getParticipantLimit() - count <= 0) {
             throw new ConflictException("достигнут лимит по заявкам на данное событие");
