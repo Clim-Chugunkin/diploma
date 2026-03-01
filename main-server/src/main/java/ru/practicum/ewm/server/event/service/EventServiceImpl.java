@@ -12,6 +12,7 @@ import ru.practicum.ewm.server.event.model.State;
 import ru.practicum.ewm.server.event.model.StateAction;
 import ru.practicum.ewm.server.event.repository.EventRepository;
 import ru.practicum.ewm.server.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.server.exceptions.ConflictException;
 import ru.practicum.ewm.server.exceptions.InvalidDateException;
 import ru.practicum.ewm.server.request.model.Status;
 import ru.practicum.ewm.server.user.model.User;
@@ -79,7 +80,7 @@ public class EventServiceImpl implements EventService {
         }
         //изменить можно только отмененные события или события в состоянии ожидания модерации
         if (event.getState() == State.PUBLISHED) {
-            throw new InvalidDateException("изменить можно только отмененные события или события в состоянии ожидания модерации");
+            throw new ConflictException("изменить можно только отмененные события или события в состоянии ожидания модерации");
         }
 
         if (LocalDateTime.now().plusHours(2).isAfter(event.getEventDate())) {
@@ -117,7 +118,7 @@ public class EventServiceImpl implements EventService {
         if (updatedEvent.getStateAction() == StateAction.PUBLISH_EVENT) {
             //событие можно публиковать, только если оно в состоянии ожидания публикации
             if (event.getState() != State.PENDING) {
-                throw new InvalidDateException("Нельзя опубликовать событие потому что он не в стадии " + event.getState());
+                throw new ConflictException("Нельзя опубликовать событие потому что он  в стадии " + event.getState());
             }
             //дата начала изменяемого события должна быть не ранее чем за час от даты публикации
             if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
@@ -132,7 +133,7 @@ public class EventServiceImpl implements EventService {
         if (updatedEvent.getStateAction() == StateAction.REJECT_EVENT) {
             //событие можно отклонить, только если оно еще не опубликовано
             if (event.getState() == State.PUBLISHED) {
-                throw new InvalidDateException("событие можно отклонить, только если оно еще не опубликовано");
+                throw new ConflictException("событие можно отклонить, только если оно еще не опубликовано");
             }
             event.setState(State.CANCELED);
         }
@@ -147,7 +148,6 @@ public class EventServiceImpl implements EventService {
         Pageable offsetLimitRequest = new OffsetLimitRequest(filter.getFrom(), filter.getSize());
         return eventRepository.findEventsByAdmin(filter.getUsers(), filter.getStates(),
                 filter.getCategories(), filter.getStart(), filter.getEnd(), Status.CONFIRMED, offsetLimitRequest);
-
     }
 
     @Override

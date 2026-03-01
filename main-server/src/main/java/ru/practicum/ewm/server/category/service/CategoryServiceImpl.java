@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.server.category.model.Category;
 import ru.practicum.ewm.server.category.repository.CategoryRepository;
+import ru.practicum.ewm.server.event.repository.EventRepository;
 import ru.practicum.ewm.server.exceptions.ConditionsNotMetException;
 import ru.practicum.ewm.server.exceptions.ConflictException;
 import ru.practicum.ewm.server.utils.OffsetLimitRequest;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public Category add(Category category) {
@@ -35,6 +37,11 @@ public class CategoryServiceImpl implements CategoryService {
     public void remove(Long id) {
         //check if exists
         categoryRepository.findById(id).orElseThrow(() -> new ConditionsNotMetException("категория с id = " + id + " не существует"));
+        //check if events with this cat exist
+        Long relativeEvents = eventRepository.countByCategoryId(id);
+        if (relativeEvents != 0) {
+            throw new ConflictException("К категории привязаны события");
+        }
         categoryRepository.deleteById(id);
         log.info("Категория с id = {} удалена", id);
     }

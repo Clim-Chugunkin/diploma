@@ -16,8 +16,8 @@ public class CategoryControllerPublic {
 
     @GetMapping
     public List<CategoryDto> getAll(@RequestParam(defaultValue = "0") int from,
-                                    @RequestParam(defaultValue = "10") int limit) {
-        return categoryService.getAll(from, limit).stream()
+                                    @RequestParam(defaultValue = "10") int size) {
+        return categoryService.getAll(from, size).stream()
                 .map(CategoryMapper::fromCategoryToCategoryDto)
                 .toList();
     }

@@ -6,6 +6,7 @@ import ru.practicum.ewm.server.event.model.Event;
 import ru.practicum.ewm.server.event.model.State;
 import ru.practicum.ewm.server.event.repository.EventRepository;
 import ru.practicum.ewm.server.exceptions.ConditionsNotMetException;
+import ru.practicum.ewm.server.exceptions.ConflictException;
 import ru.practicum.ewm.server.exceptions.InvalidDateException;
 import ru.practicum.ewm.server.request.DTO.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.server.request.DTO.EventRequestStatusUpdateResult;
@@ -35,19 +36,27 @@ public class RequestServiceImpl implements RequestService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ConditionsNotMetException("события с id = " + eventId + " нет"));
         //инициатор события не может добавить запрос на участие в своём событии
         if (userId.equals(event.getInitiator().getId())) {
-            throw new InvalidDateException("инициатор события не может добавить запрос на участие в своём событии");
+            throw new ConflictException("инициатор события не может добавить запрос на участие в своём событии");
         }
         //нельзя участвовать в неопубликованном событии
         if (event.getState() != State.PUBLISHED) {
-            throw new InvalidDateException("нельзя участвовать в неопубликованном событии");
+            throw new ConflictException("нельзя участвовать в неопубликованном событии");
         }
         //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
+        Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
+        if (event.getParticipantLimit() - count <= 0) {
+            throw new ConflictException("достигнут лимит по заявкам на данное событие");
+        }
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
         if (event.getParticipantLimit() == 0) {
             request.setStatus(Status.CONFIRMED);
         } else {
             request.setStatus(Status.PENDING);
+        }
+        //если пользователь уже создал запрос на событие
+        if (requestRepository.countByEventAndRequestor(eventId, userId) != 0) {
+            throw new ConflictException("Пользователь уже создал запрос на данное событие");
         }
         request.setRequestor(userId);
         request.setEvent(eventId);
@@ -108,7 +117,7 @@ public class RequestServiceImpl implements RequestService {
         Long count = requestRepository.getAllRequest(eventId, Status.CONFIRMED);
         //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         if (event.getParticipantLimit() - count <= 0) {
-            throw new InvalidDateException("достигнут лимит по заявкам на данное событие");
+            throw new ConflictException("достигнут лимит по заявкам на данное событие");
         }
         //статус можно изменить только у заявок, находящихся в состоянии ожидания
         requests.forEach((it) -> {
@@ -116,16 +125,23 @@ public class RequestServiceImpl implements RequestService {
                 throw new InvalidDateException("статус можно изменить только у заявок, находящихся в состоянии ожидания ");
             }
         });
-        //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
-        for (int i = 0; i < requests.size(); i++) {
-            if ((event.getParticipantLimit() - count > 0)) {
-                requests.get(i).setStatus(Status.CONFIRMED);
-                result.getConfirmedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
-            } else {
+        if (eventRequests.getStatus() == ru.practicum.ewm.server.request.DTO.Status.CONFIRMED) {
+            //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
+            for (int i = 0; i < requests.size(); i++) {
+                if ((event.getParticipantLimit() - count > 0)) {
+                    requests.get(i).setStatus(Status.CONFIRMED);
+                    result.getConfirmedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
+                } else {
+                    requests.get(i).setStatus(Status.CANCELED);
+                    result.getRejectedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
+                }
+                count++;
+            }
+        } else {
+            for (int i = 0; i < requests.size(); i++) {
                 requests.get(i).setStatus(Status.CANCELED);
                 result.getRejectedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
             }
-            count++;
         }
         requestRepository.saveAll(requests);
         return result;

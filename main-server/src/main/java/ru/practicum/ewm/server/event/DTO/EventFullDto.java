@@ -44,7 +44,9 @@ public class EventFullDto {
         this.location = new Location(event.getLat(), event.getLon());
         this.paid = event.getPaid();
         this.participantLimit = event.getParticipantLimit();
-        this.publishedOn = event.getPublishedOn().format(formatter);
+        if (event.getPublishedOn() != null) {
+            this.publishedOn = event.getPublishedOn().format(formatter);
+        }
         this.requestModeration = event.getRequestModeration();
         this.title = event.getTitle();
         this.state = event.getState();

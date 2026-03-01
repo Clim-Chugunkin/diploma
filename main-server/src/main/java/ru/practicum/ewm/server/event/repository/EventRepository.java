@@ -22,6 +22,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByInitiator_Id(Long userId, Pageable pageable);
 
+    Long countByCategoryId(Long id);
+
 
     @Query("select new ru.practicum.ewm.server.event.DTO.EventFullDto(" +
             "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it " +

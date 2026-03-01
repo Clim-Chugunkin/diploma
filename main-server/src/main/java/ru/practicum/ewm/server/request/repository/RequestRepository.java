@@ -18,4 +18,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             "where it.event = ?1 and " +
             "it.status = ?2")
     Long getAllRequest(Long event, Status status);
+
+    Long countByEventAndRequestor(Long event, Long requestor);
 }

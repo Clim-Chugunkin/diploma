@@ -54,7 +54,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto updateCompilation(Long compId, NewCompilationDto compilationDto) {
 
-        if (compilationDto.getTitle().length() > 50) {
+        if ((compilationDto.getTitle() != null) && (compilationDto.getTitle().length() > 50)) {
             throw new InvalidArgumentException("title должно быть от 1 до 50 символов");
         }
 
