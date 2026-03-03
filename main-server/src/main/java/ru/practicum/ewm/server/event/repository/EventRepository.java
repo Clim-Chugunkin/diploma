@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 
     @Query("select new ru.practicum.ewm.server.event.DTO.EventWithRequests(" +
-            "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it " +
+            "it, count(r)  ) from Event as it left join Request as r on (r.event = it.id and r.status = :status)" +
             "where (:users is null or it.initiator.id in :users) and " +
             "(:states is null or it.state in :states) and " +
             "(:categories is null or it.category.id in :categories) and " +
@@ -40,14 +40,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                               Pageable pageable);
 
     @Query("select new ru.practicum.ewm.server.event.DTO.EventWithRequests(" +
-            "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it" +
+            "it, count(r)  ) from Event as it left join Request as r on (r.event = it.id and r.status = :status)" +
             " where " +
             "(:text is null or  (LOWER(it.annotation) like LOWER(CONCAT('%',cast(:text as String),'%')) or LOWER(it.description) like LOWER(CONCAT('%',cast(:text as String),'%'))) ) and " +
             "(:categories is null or it.category.id in :categories) and " +
             "(:paid is null or it.paid = :paid) and " +
             "(cast(:rangeStart as timestamp) is null or it.eventDate > :rangeStart) and " +
-            "(cast(:rangeEnd as timestamp) is null or it.eventDate < :rangeEnd) and " +
-            "CASE WHEN :available = true THEN (select count(r) cr from Request as r where r.event = it.id and r.status = :status) < it.participantLimit else true END")
+            "(cast(:rangeEnd as timestamp) is null or it.eventDate < :rangeEnd)  " +
+            "group by it.id " +
+            "having case when :available = true then count(r) < it.participantLimit else true END")
     List<EventWithRequests> getAllWithFilters(@Param("text") String text,
                                               @Param("categories") Integer[] categories,
                                               @Param("paid") Boolean paid,
@@ -57,9 +58,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                               @Param("status") Status status, Pageable pageable);
 
     @Query("select new ru.practicum.ewm.server.event.DTO.EventWithRequests(" +
-            "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it" +
-            " where it.id = :id and " +
-            "it.state = :state")
+            "it, count(r)  ) from Event as it left join Request as r on (r.event = it.id and r.status = :status) " +
+            "where it.id = :id " +
+            "and it.state = :state " +
+            "group by it.id")
     Optional<EventWithRequests> getEventById(@Param("id") Long id,
                                              @Param("status") Status status,
                                              @Param("state") State state);
