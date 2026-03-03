@@ -11,6 +11,6 @@ public class DateTimeFormat {
     }
 
     public LocalDateTime fromString(String date) {
-        return date != null ? LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")) : null;
+        return date != null ? LocalDateTime.parse(date, formatter) : null;
     }
 }
