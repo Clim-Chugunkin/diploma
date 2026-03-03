@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.practicum.ewm.server.utils.DateTimeFormat;
 import ru.practicum.stats.client.StatsClient;
 
 @Configuration
@@ -15,5 +16,10 @@ public class MainServerConfig {
     @Bean
     public StatsClient statsClient(RestTemplateBuilder builder) {
         return new StatsClient(statsServerUrl, builder);
+    }
+
+    @Bean
+    public DateTimeFormat dateTimeFormat() {
+        return new DateTimeFormat();
     }
 }

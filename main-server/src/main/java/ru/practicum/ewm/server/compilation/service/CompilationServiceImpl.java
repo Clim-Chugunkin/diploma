@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
 
     @Override
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
@@ -41,7 +42,7 @@ public class CompilationServiceImpl implements CompilationService {
         }
 
         CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(compilationRepository.save(CompilationMapper.fromCompilationDtoToCompilation(newCompilationDto)));
-        compilationDto.setEvents(events.stream().map(EventMapper::fromEventToShortEvent).toList());
+        compilationDto.setEvents(events.stream().map(eventMapper::toEventShortDto).toList());
         return compilationDto;
     }
 
@@ -75,7 +76,7 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation updatedCompilation = CompilationMapper.joinCompilationWithDto(compilation, compilationDto);
         CompilationDto result = CompilationMapper.fromCompilationToCompilationDto(compilationRepository.save(updatedCompilation));
         result.setEvents(events.stream()
-                .map(EventMapper::fromEventToShortEvent)
+                .map(eventMapper::toEventShortDto)
                 .toList());
         return result;
     }
@@ -85,7 +86,7 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new ConditionsNotMetException("подборки с id = " + compId + "нет"));
         CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(compilation);
         compilationDto.setEvents(eventRepository.findAllByIdIn(compilation.getEvents()).stream()
-                .map(EventMapper::fromEventToShortEvent).toList());
+                .map(eventMapper::toEventShortDto).toList());
         return compilationDto;
 
     }
@@ -101,7 +102,7 @@ public class CompilationServiceImpl implements CompilationService {
         return compilations.stream()
                 .map(it -> {
                     CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(it);
-                    compilationDto.setEvents(events.stream().filter(event -> it.getEvents().contains(event.getId())).map(EventMapper::fromEventToShortEvent).toList());
+                    compilationDto.setEvents(events.stream().filter(event -> it.getEvents().contains(event.getId())).map(eventMapper::toEventShortDto).toList());
                     return compilationDto;
                 })
                 .toList();

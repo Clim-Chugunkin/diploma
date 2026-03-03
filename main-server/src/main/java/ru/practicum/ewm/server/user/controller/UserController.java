@@ -16,11 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@Valid @RequestBody NewUserRequest user) {
-        return UserMapper.fromUserToUserDto(userService.addUser(UserMapper.fromNewUserRequestToUser(user)));
+        return userMapper.toUserDto(userService.addUser(userMapper.toUser(user)));
     }
 
     @GetMapping
@@ -28,7 +29,7 @@ public class UserController {
                                   @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") int size) {
         return userService.getUsers(ids, from, size).stream()
-                .map(UserMapper::fromUserToUserDto)
+                .map(userMapper::toUserDto)
                 .toList();
     }
 

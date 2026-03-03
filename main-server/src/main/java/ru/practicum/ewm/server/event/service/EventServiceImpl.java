@@ -36,6 +36,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final StatsClient statsClient;
+    private final EventMapper eventMapper;
 
     @Override
     public EventFullDto addEvent(NewEventDto newEvent, Long userId) {
@@ -44,25 +45,25 @@ public class EventServiceImpl implements EventService {
         //check category existence
         Category cat = categoryRepository.findById(newEvent.getCategory()).orElseThrow(() -> new ConditionsNotMetException("категории  с id = " + newEvent.getCategory() + " нет"));
         //check eventDate is correct
-        Event event = EventMapper.fromNewEventToEvent(newEvent, user, cat);
-        System.out.println(event.getEventDate());
+        Event event = eventMapper.toEvent(newEvent);
+        event.setInitiator(user);
         if (LocalDateTime.now().plusHours(2).isAfter(event.getEventDate())) {
             throw new InvalidDateException("дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента");
         }
-        return EventMapper.fromEventToFullEvent(eventRepository.save(event));
+        return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
     @Override
     public EventFullDto getById(Long userId, Long eventId) {
         Event event = eventRepository.findByIdAndInitiator_Id(eventId, userId).orElseThrow(() -> new ConditionsNotMetException("такого события нет"));
-        return EventMapper.fromEventToFullEvent(event);
+        return eventMapper.toEventFullDto(event);
     }
 
     @Override
     public List<EventShortDto> getAllUserEvents(Long userId, int from, int size) {
         Pageable offsetLimitRequest = new OffsetLimitRequest(from, size);
         return eventRepository.findAllByInitiator_Id(userId, offsetLimitRequest).stream()
-                .map(EventMapper::fromEventToShortEvent)
+                .map(eventMapper::toEventShortDto)
                 .toList();
     }
 
@@ -73,7 +74,7 @@ public class EventServiceImpl implements EventService {
 
 
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ConditionsNotMetException("события с id = " + eventId + " нет"));
-        event = EventMapper.joinEventWithUpdateEvent(event, updatedEvent);
+        event = joinEventWithUpdateEvent(event, updatedEvent);
         //check if user is initiator
         if (!Objects.equals(user.getId(), event.getInitiator().getId())) {
             throw new InvalidDateException("пользователь с id = " + userId + "не является создателем события");
@@ -102,13 +103,13 @@ public class EventServiceImpl implements EventService {
             event.setState(State.PENDING);
         }
 
-        return EventMapper.fromEventToFullEvent(eventRepository.save(event));
+        return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventUserRequest updatedEvent) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ConditionsNotMetException("события с id = " + eventId + " нет"));
-        event = EventMapper.joinEventWithUpdateEvent(event, updatedEvent);
+        event = joinEventWithUpdateEvent(event, updatedEvent);
 
         if (LocalDateTime.now().plusHours(2).isAfter(event.getEventDate())) {
             throw new InvalidDateException("дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента");
@@ -139,7 +140,7 @@ public class EventServiceImpl implements EventService {
         }
 
 
-        return EventMapper.fromEventToFullEvent(eventRepository.save(event));
+        return eventMapper.toEventFullDto(eventRepository.save(event));
     }
 
 
@@ -147,7 +148,10 @@ public class EventServiceImpl implements EventService {
     public List<EventFullDto> findEvents(FilterDto filter) {
         Pageable offsetLimitRequest = new OffsetLimitRequest(filter.getFrom(), filter.getSize());
         return eventRepository.findEventsByAdmin(filter.getUsers(), filter.getStates(),
-                filter.getCategories(), filter.getStart(), filter.getEnd(), Status.CONFIRMED, offsetLimitRequest);
+                        filter.getCategories(), filter.getStart(), filter.getEnd(), Status.CONFIRMED, offsetLimitRequest).stream()
+                .map(this::toEventFullDto)
+                .toList();
+
     }
 
     @Override
@@ -164,16 +168,18 @@ public class EventServiceImpl implements EventService {
                 throw new InvalidDateException("дата начала не должна быть позже даты конца");
             }
         }
-        System.out.println(filterDto.getStart());
+
         Pageable offsetLimitRequest = new OffsetLimitRequest(filterDto.getFrom(), filterDto.getSize());
         List<EventShortDto> list = eventRepository.getAllWithFilters(filterDto.getText(),
-                filterDto.getCategories(),
-                filterDto.getPaid(),
-                filterDto.getStart(),
-                filterDto.getEnd(),
-                filterDto.getOnlyAvailable(),
-                Status.CONFIRMED,
-                offsetLimitRequest);
+                        filterDto.getCategories(),
+                        filterDto.getPaid(),
+                        filterDto.getStart(),
+                        filterDto.getEnd(),
+                        filterDto.getOnlyAvailable(),
+                        Status.CONFIRMED,
+                        offsetLimitRequest).stream()
+                .map(this::toEventShortDto)
+                .toList();
 
         switch (filterDto.getSort()) {
             case "EVENT_DATE" -> {
@@ -204,9 +210,46 @@ public class EventServiceImpl implements EventService {
                 .findFirst()
                 .orElse(0L);
 
-        EventFullDto event = eventRepository.getEventById(id, Status.CONFIRMED, State.PUBLISHED)
-                .orElseThrow(() -> new ConditionsNotMetException("события с id = " + id + " нет или оно не опубликовано"));
+        EventFullDto event = this.toEventFullDto(eventRepository.getEventById(id, Status.CONFIRMED, State.PUBLISHED)
+                .orElseThrow(() -> new ConditionsNotMetException("события с id = " + id + " нет или оно не опубликовано")));
+
         event.setViews(views);
         return event;
+    }
+
+    private Event joinEventWithUpdateEvent(Event event, UpdateEventUserRequest request) {
+        if (request.getAnnotation() != null) event.setAnnotation(request.getAnnotation());
+        if (request.getCategory() != null) {
+            Category cat = new Category();
+            cat.setId(request.getCategory());
+            event.setCategory(cat);
+        }
+        if (request.getDescription() != null) event.setDescription(request.getDescription());
+        if (request.getEventDate() != null) {
+            event.setEventDate(LocalDateTime.parse(request.getEventDate(), formatter));
+        }
+        if (request.getLocation() != null) {
+            event.setLat(request.getLocation().getLat());
+            event.setLon(request.getLocation().getLon());
+        }
+        if (request.getPaid() != null) event.setPaid(request.getPaid());
+        if (request.getParticipantLimit() != null) event.setParticipantLimit(request.getParticipantLimit());
+        if (request.getRequestModeration() != null) event.setRequestModeration(request.getRequestModeration());
+        if (request.getTitle() != null) event.setTitle(request.getTitle());
+        return event;
+    }
+
+    private EventFullDto toEventFullDto(EventWithRequests eventWithRequests) {
+        if (eventWithRequests == null) return null;
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(eventWithRequests.getEvent());
+        eventFullDto.setConfirmedRequests(eventWithRequests.getConfirmedRequests());
+        return eventFullDto;
+    }
+
+    private EventShortDto toEventShortDto(EventWithRequests eventWithRequests) {
+        if (eventWithRequests == null) return null;
+        EventShortDto eventShortDto = eventMapper.toEventShortDto(eventWithRequests.getEvent());
+        eventShortDto.setConfirmedRequests(eventWithRequests.getConfirmedRequests());
+        return eventShortDto;
     }
 }

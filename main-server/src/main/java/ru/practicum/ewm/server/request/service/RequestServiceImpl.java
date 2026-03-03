@@ -27,6 +27,7 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final RequestMapper requestMapper;
 
     @Override
     public ParticipationRequestDto addRequest(Long userId, Long eventId) {
@@ -65,7 +66,7 @@ public class RequestServiceImpl implements RequestService {
         }
         request.setRequestor(userId);
         request.setEvent(eventId);
-        return RequestMapper.fromRequestToRequestDto(requestRepository.save(request));
+        return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     @Override
@@ -79,13 +80,13 @@ public class RequestServiceImpl implements RequestService {
             throw new InvalidDateException("пользователь с id = " + userId + "не является создателем запроса с id " + requestId);
         }
         request.setStatus(Status.CANCELED);
-        return RequestMapper.fromRequestToRequestDto(requestRepository.save(request));
+        return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     @Override
     public List<ParticipationRequestDto> getAllRequestsByUser(Long userId) {
         return requestRepository.findAllByRequestor(userId).stream()
-                .map(RequestMapper::fromRequestToRequestDto)
+                .map(requestMapper::toParticipationRequestDto)
                 .toList();
     }
 
@@ -100,7 +101,7 @@ public class RequestServiceImpl implements RequestService {
             throw new InvalidDateException("пользователь с id = " + userId + "не является создателем события с id " + eventId);
         }
         return requestRepository.findAllByEvent(eventId).stream()
-                .map(RequestMapper::fromRequestToRequestDto)
+                .map(requestMapper::toParticipationRequestDto)
                 .toList();
     }
 
@@ -115,7 +116,7 @@ public class RequestServiceImpl implements RequestService {
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
         //если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
         if (event.getParticipantLimit() == 0) {
-            result.setRejectedRequests(requests.stream().map(RequestMapper::fromRequestToRequestDto).toList());
+            result.setRejectedRequests(requests.stream().map(requestMapper::toParticipationRequestDto).toList());
             return result;
         }
         //get all confirmed request of event
@@ -135,17 +136,17 @@ public class RequestServiceImpl implements RequestService {
             for (int i = 0; i < requests.size(); i++) {
                 if ((event.getParticipantLimit() - count > 0)) {
                     requests.get(i).setStatus(Status.CONFIRMED);
-                    result.getConfirmedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
+                    result.getConfirmedRequests().add(requestMapper.toParticipationRequestDto(requests.get(i)));
                 } else {
                     requests.get(i).setStatus(Status.REJECTED);
-                    result.getRejectedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
+                    result.getRejectedRequests().add(requestMapper.toParticipationRequestDto(requests.get(i)));
                 }
                 count++;
             }
         } else {
             for (int i = 0; i < requests.size(); i++) {
                 requests.get(i).setStatus(Status.REJECTED);
-                result.getRejectedRequests().add(RequestMapper.fromRequestToRequestDto(requests.get(i)));
+                result.getRejectedRequests().add(requestMapper.toParticipationRequestDto(requests.get(i)));
             }
         }
         requestRepository.saveAll(requests);

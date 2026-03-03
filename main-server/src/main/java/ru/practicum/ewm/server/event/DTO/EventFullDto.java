@@ -3,12 +3,10 @@ package ru.practicum.ewm.server.event.DTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.server.category.DTO.CategoryDto;
-import ru.practicum.ewm.server.category.mapper.CategoryMapper;
 import ru.practicum.ewm.server.event.model.Event;
 import ru.practicum.ewm.server.event.model.Location;
 import ru.practicum.ewm.server.event.model.State;
 import ru.practicum.ewm.server.user.DTO.UserShortDto;
-import ru.practicum.ewm.server.user.mapper.UserMapper;
 
 import static ru.practicum.ewm.server.utils.DateTimeFormat.formatter;
 
@@ -36,11 +34,11 @@ public class EventFullDto {
         this.id = event.getId();
         this.annotation = event.getAnnotation();
         this.confirmedRequests = confirmedRequest;
-        this.category = CategoryMapper.fromCategoryToCategoryDto(event.getCategory());
+        //this.category = CategoryMapper.fromCategoryToCategoryDto(event.getCategory());
         this.createdOn = event.getCreatedOn().format(formatter);
         this.description = event.getDescription();
         this.eventDate = event.getEventDate().format(formatter);
-        this.initiator = UserMapper.fromUserToUserShortDto(event.getInitiator());
+        //this.initiator = UserMapper.fromUserToUserShortDto(event.getInitiator());
         this.location = new Location(event.getLat(), event.getLon());
         this.paid = event.getPaid();
         this.participantLimit = event.getParticipantLimit();

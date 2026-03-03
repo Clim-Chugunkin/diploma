@@ -4,8 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.ewm.server.event.DTO.EventFullDto;
-import ru.practicum.ewm.server.event.DTO.EventShortDto;
+import ru.practicum.ewm.server.event.DTO.EventWithRequests;
 import ru.practicum.ewm.server.event.model.Event;
 import ru.practicum.ewm.server.event.model.State;
 import ru.practicum.ewm.server.request.model.Status;
@@ -25,22 +24,22 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Long countByCategoryId(Long id);
 
 
-    @Query("select new ru.practicum.ewm.server.event.DTO.EventFullDto(" +
+    @Query("select new ru.practicum.ewm.server.event.DTO.EventWithRequests(" +
             "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it " +
             "where (:users is null or it.initiator.id in :users) and " +
             "(:states is null or it.state in :states) and " +
             "(:categories is null or it.category.id in :categories) and " +
             "(cast(:rangeStart as timestamp) is null or it.eventDate > :rangeStart) and " +
             "(cast(:rangeEnd as timestamp) is null or it.eventDate < :rangeEnd)")
-    List<EventFullDto> findEventsByAdmin(@Param("users") Integer[] users,
-                                         @Param("states") String[] states,
-                                         @Param("categories") Integer[] categories,
-                                         @Param("rangeStart") LocalDateTime start,
-                                         @Param("rangeEnd") LocalDateTime end,
-                                         @Param("status") Status status,
-                                         Pageable pageable);
+    List<EventWithRequests> findEventsByAdmin(@Param("users") Integer[] users,
+                                              @Param("states") String[] states,
+                                              @Param("categories") Integer[] categories,
+                                              @Param("rangeStart") LocalDateTime start,
+                                              @Param("rangeEnd") LocalDateTime end,
+                                              @Param("status") Status status,
+                                              Pageable pageable);
 
-    @Query("select new ru.practicum.ewm.server.event.DTO.EventShortDto(" +
+    @Query("select new ru.practicum.ewm.server.event.DTO.EventWithRequests(" +
             "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it" +
             " where " +
             "(:text is null or  (LOWER(it.annotation) like LOWER(CONCAT('%',cast(:text as String),'%')) or LOWER(it.description) like LOWER(CONCAT('%',cast(:text as String),'%'))) ) and " +
@@ -49,21 +48,21 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "(cast(:rangeStart as timestamp) is null or it.eventDate > :rangeStart) and " +
             "(cast(:rangeEnd as timestamp) is null or it.eventDate < :rangeEnd) and " +
             "CASE WHEN :available = true THEN (select count(r) cr from Request as r where r.event = it.id and r.status = :status) < it.participantLimit else true END")
-    List<EventShortDto> getAllWithFilters(@Param("text") String text,
-                                          @Param("categories") Integer[] categories,
-                                          @Param("paid") Boolean paid,
-                                          @Param("rangeStart") LocalDateTime start,
-                                          @Param("rangeEnd") LocalDateTime end,
-                                          @Param("available") Boolean available,
-                                          @Param("status") Status status, Pageable pageable);
+    List<EventWithRequests> getAllWithFilters(@Param("text") String text,
+                                              @Param("categories") Integer[] categories,
+                                              @Param("paid") Boolean paid,
+                                              @Param("rangeStart") LocalDateTime start,
+                                              @Param("rangeEnd") LocalDateTime end,
+                                              @Param("available") Boolean available,
+                                              @Param("status") Status status, Pageable pageable);
 
-    @Query("select new ru.practicum.ewm.server.event.DTO.EventFullDto(" +
+    @Query("select new ru.practicum.ewm.server.event.DTO.EventWithRequests(" +
             "it, (select count(r) cr from Request as r where r.event = it.id and r.status = :status) ) from Event as it" +
             " where it.id = :id and " +
             "it.state = :state")
-    Optional<EventFullDto> getEventById(@Param("id") Long id,
-                                        @Param("status") Status status,
-                                        @Param("state") State state);
+    Optional<EventWithRequests> getEventById(@Param("id") Long id,
+                                             @Param("status") Status status,
+                                             @Param("state") State state);
 
 
 }

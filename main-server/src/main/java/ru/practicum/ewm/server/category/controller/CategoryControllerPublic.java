@@ -13,17 +13,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryControllerPublic {
     private final CategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping
     public List<CategoryDto> getAll(@RequestParam(defaultValue = "0") int from,
                                     @RequestParam(defaultValue = "10") int size) {
         return categoryService.getAll(from, size).stream()
-                .map(CategoryMapper::fromCategoryToCategoryDto)
+                .map(categoryMapper::toCategoryDto)
                 .toList();
     }
 
     @GetMapping("/{id}")
     public CategoryDto getById(@PathVariable Long id) {
-        return CategoryMapper.fromCategoryToCategoryDto(categoryService.getById(id));
+        return categoryMapper.toCategoryDto(categoryService.getById(id));
     }
 }

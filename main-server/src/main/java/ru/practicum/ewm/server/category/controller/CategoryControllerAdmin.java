@@ -14,11 +14,12 @@ import ru.practicum.ewm.server.category.service.CategoryService;
 @RequiredArgsConstructor
 public class CategoryControllerAdmin {
     private final CategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto add(@Valid @RequestBody NewCategoryDto category) {
-        return CategoryMapper.fromCategoryToCategoryDto(categoryService.add(CategoryMapper.fromNewCategoryDtoToCategory(category)));
+        return categoryMapper.toCategoryDto(categoryService.add(categoryMapper.toCategory(category)));
     }
 
     @DeleteMapping("/{id}")
@@ -31,7 +32,7 @@ public class CategoryControllerAdmin {
     public CategoryDto update(@PathVariable Long id,
                               @Valid @RequestBody CategoryDto category) {
         category.setId(id);
-        return CategoryMapper.fromCategoryToCategoryDto(categoryService.update(CategoryMapper.fromCategoryDtoToCategory(category)));
+        return categoryMapper.toCategoryDto(categoryService.update(categoryMapper.toCategory(category)));
     }
 
 }
