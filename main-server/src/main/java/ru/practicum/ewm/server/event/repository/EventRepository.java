@@ -30,7 +30,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "(:states is null or it.state in :states) and " +
             "(:categories is null or it.category.id in :categories) and " +
             "(cast(:rangeStart as timestamp) is null or it.eventDate > :rangeStart) and " +
-            "(cast(:rangeEnd as timestamp) is null or it.eventDate < :rangeEnd)")
+            "(cast(:rangeEnd as timestamp) is null or it.eventDate < :rangeEnd) " +
+            "group by it.id")
     List<EventWithRequests> findEventsByAdmin(@Param("users") Integer[] users,
                                               @Param("states") String[] states,
                                               @Param("categories") Integer[] categories,
