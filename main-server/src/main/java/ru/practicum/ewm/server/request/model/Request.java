@@ -14,9 +14,11 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime created;
     private Long event;
     private Long requestor;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 }

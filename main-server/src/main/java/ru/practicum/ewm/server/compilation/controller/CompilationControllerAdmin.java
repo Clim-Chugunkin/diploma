@@ -31,6 +31,4 @@ public class CompilationControllerAdmin {
                                             @RequestBody NewCompilationDto compilationDto) {
         return compilationService.updateCompilation(compId, compilationDto);
     }
-
-
 }

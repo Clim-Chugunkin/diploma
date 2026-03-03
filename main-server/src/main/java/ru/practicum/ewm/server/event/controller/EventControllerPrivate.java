@@ -63,5 +63,4 @@ public class EventControllerPrivate {
 
         return requestService.changeStatus(userId, eventId, request);
     }
-
 }

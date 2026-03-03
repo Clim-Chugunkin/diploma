@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class CategoryDto {
     private Long id;
+
     @NotNull(message = "не указано имя")
     @NotBlank(message = "имя не должно быть пустым")
     @Size(max = 50, message = "имя категории должно быть  не больше 50 символов")

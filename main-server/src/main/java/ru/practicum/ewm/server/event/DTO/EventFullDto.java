@@ -29,25 +29,4 @@ public class EventFullDto {
     private String title;
     private State state;
     private Long views;
-
-    public EventFullDto(Event event, Long confirmedRequest) {
-        this.id = event.getId();
-        this.annotation = event.getAnnotation();
-        this.confirmedRequests = confirmedRequest;
-        //this.category = CategoryMapper.fromCategoryToCategoryDto(event.getCategory());
-        this.createdOn = event.getCreatedOn().format(formatter);
-        this.description = event.getDescription();
-        this.eventDate = event.getEventDate().format(formatter);
-        //this.initiator = UserMapper.fromUserToUserShortDto(event.getInitiator());
-        this.location = new Location(event.getLat(), event.getLon());
-        this.paid = event.getPaid();
-        this.participantLimit = event.getParticipantLimit();
-        if (event.getPublishedOn() != null) {
-            this.publishedOn = event.getPublishedOn().format(formatter);
-        }
-        this.requestModeration = event.getRequestModeration();
-        this.title = event.getTitle();
-        this.state = event.getState();
-    }
-
 }

@@ -9,6 +9,7 @@ import lombok.Data;
 public class Location {
     @NotNull(message = "не указана широта ")
     private Double lat;
+
     @NotNull(message = "не указана долгота ")
     private Double lon;
 }

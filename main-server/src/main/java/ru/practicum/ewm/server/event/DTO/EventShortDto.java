@@ -21,15 +21,4 @@ public class EventShortDto {
     private Boolean paid;
     private String title;
     private Long views;
-
-    public EventShortDto(Event event, Long confirmedRequest) {
-        this.id = event.getId();
-        this.annotation = event.getAnnotation();
-        this.confirmedRequests = confirmedRequest;
-        //this.category = CategoryMapper.fromCategoryToCategoryDto(event.getCategory());
-        this.eventDate = event.getEventDate().format(formatter);
-        //this.initiator = UserMapper.fromUserToUserShortDto(event.getInitiator());
-        this.paid = event.getPaid();
-        this.title = event.getTitle();
-    }
 }

@@ -16,6 +16,7 @@ public class Compilation {
     private Long id;
     private Boolean pinned;
     private String title;
+
     @ElementCollection
     @CollectionTable(name = "compilation_events", joinColumns = @JoinColumn(name = "compilation_id"))
     @Column(name = "event_id")

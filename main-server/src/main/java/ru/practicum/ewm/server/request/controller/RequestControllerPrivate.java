@@ -31,5 +31,4 @@ public class RequestControllerPrivate {
     public List<ParticipationRequestDto> getAllRequestsByUser(@PathVariable Long userId) {
         return requestService.getAllRequestsByUser(userId);
     }
-
 }

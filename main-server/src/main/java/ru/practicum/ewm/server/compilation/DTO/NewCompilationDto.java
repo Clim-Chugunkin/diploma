@@ -11,6 +11,7 @@ import java.util.Set;
 public class NewCompilationDto {
     private Set<Long> events;
     private Boolean pinned = false;
+
     @NotNull(message = "не указан заголовок")
     @NotBlank(message = "заголовок не может быть пустым")
     @Size(min = 1, max = 50, message = "title должно быть от 1 до 50 символов")

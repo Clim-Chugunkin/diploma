@@ -27,6 +27,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+    private final CompilationMapper compilationMapper;
 
     @Override
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
@@ -41,7 +42,7 @@ public class CompilationServiceImpl implements CompilationService {
             throw new ConflictException("событий с id = " + unExistedEvents + " нет");
         }
 
-        CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(compilationRepository.save(CompilationMapper.fromCompilationDtoToCompilation(newCompilationDto)));
+        CompilationDto compilationDto = compilationMapper.toCompilationDto(compilationRepository.save(compilationMapper.toCompilation(newCompilationDto)));
         compilationDto.setEvents(events.stream().map(eventMapper::toEventShortDto).toList());
         return compilationDto;
     }
@@ -73,8 +74,8 @@ public class CompilationServiceImpl implements CompilationService {
         } else {
             events = eventRepository.findAllByIdIn(compilation.getEvents());
         }
-        Compilation updatedCompilation = CompilationMapper.joinCompilationWithDto(compilation, compilationDto);
-        CompilationDto result = CompilationMapper.fromCompilationToCompilationDto(compilationRepository.save(updatedCompilation));
+        Compilation updatedCompilation = this.joinCompilationWithDto(compilation, compilationDto);
+        CompilationDto result = compilationMapper.toCompilationDto(compilationRepository.save(updatedCompilation));
         result.setEvents(events.stream()
                 .map(eventMapper::toEventShortDto)
                 .toList());
@@ -84,7 +85,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new ConditionsNotMetException("подборки с id = " + compId + "нет"));
-        CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(compilation);
+        CompilationDto compilationDto = compilationMapper.toCompilationDto(compilation);
         compilationDto.setEvents(eventRepository.findAllByIdIn(compilation.getEvents()).stream()
                 .map(eventMapper::toEventShortDto).toList());
         return compilationDto;
@@ -101,10 +102,22 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> events = eventRepository.findAllByIdIn(eventsId);
         return compilations.stream()
                 .map(it -> {
-                    CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(it);
+                    CompilationDto compilationDto = compilationMapper.toCompilationDto(it);
                     compilationDto.setEvents(events.stream().filter(event -> it.getEvents().contains(event.getId())).map(eventMapper::toEventShortDto).toList());
                     return compilationDto;
                 })
                 .toList();
+    }
+        private Compilation joinCompilationWithDto(Compilation compilation, NewCompilationDto compilationDto) {
+        if (compilationDto.getEvents() != null) {
+            compilation.setEvents(compilationDto.getEvents());
+        }
+        if (compilationDto.getPinned() != null) {
+            compilation.setPinned(compilationDto.getPinned());
+        }
+        if (compilationDto.getTitle() != null) {
+            compilation.setTitle(compilationDto.getTitle());
+        }
+        return compilation;
     }
 }

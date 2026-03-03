@@ -66,6 +66,4 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Optional<EventWithRequests> getEventById(@Param("id") Long id,
                                              @Param("status") Status status,
                                              @Param("state") State state);
-
-
 }
