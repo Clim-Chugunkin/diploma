@@ -108,7 +108,8 @@ public class CompilationServiceImpl implements CompilationService {
                 })
                 .toList();
     }
-        private Compilation joinCompilationWithDto(Compilation compilation, NewCompilationDto compilationDto) {
+
+    private Compilation joinCompilationWithDto(Compilation compilation, NewCompilationDto compilationDto) {
         if (compilationDto.getEvents() != null) {
             compilation.setEvents(compilationDto.getEvents());
         }

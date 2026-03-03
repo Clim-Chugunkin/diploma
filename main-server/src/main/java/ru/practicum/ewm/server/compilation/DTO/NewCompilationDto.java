@@ -3,11 +3,13 @@ package ru.practicum.ewm.server.compilation.DTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 public class NewCompilationDto {
     private Set<Long> events;
     private Boolean pinned = false;

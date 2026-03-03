@@ -1,16 +1,13 @@
 package ru.practicum.ewm.server.event.DTO;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.ewm.server.category.DTO.CategoryDto;
-import ru.practicum.ewm.server.event.model.Event;
 import ru.practicum.ewm.server.user.DTO.UserShortDto;
 
-import static ru.practicum.ewm.server.utils.DateTimeFormat.formatter;
 
-
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class EventShortDto {
     private Long id;
     private String annotation;

@@ -2,11 +2,13 @@ package ru.practicum.ewm.server.event.DTO;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.ewm.server.event.model.Location;
 import ru.practicum.ewm.server.event.model.StateAction;
 
-@Data
+@Getter
+@Setter
 public class UpdateEventUserRequest {
     @Size(min = 20, max = 2000, message = "annotation должна быть от 20 до 2000 символов")
     private String annotation;

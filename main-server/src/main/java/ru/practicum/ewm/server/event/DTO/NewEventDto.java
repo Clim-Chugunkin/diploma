@@ -2,10 +2,12 @@ package ru.practicum.ewm.server.event.DTO;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.ewm.server.event.model.Location;
 
-@Data
+@Getter
+@Setter
 public class NewEventDto {
     @NotNull(message = "не указана аннотация события")
     @NotBlank(message = "аннотация не должна быть пустой")
