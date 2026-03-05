@@ -1,0 +1,1126 @@
+{
+  "info": {
+    "_postman_id": "7c1c7c86-856c-406d-aa07-88bee84f4a1b",
+    "name": "comment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48477147",
+    "_collection_link": "https://go.postman.co/collection/48477147-7c1c7c86-856c-406d-aa07-88bee84f4a1b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "add comment",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "                let event2 = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/admin/events/' + pm.collectionVariables.get(\"eventId\"),",
+              "                method: 'PATCH',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify({stateAction : 'PUBLISH_EVENT'})",
+              "                }",
+              "                };",
+              "                pm.sendRequest(event2,function(err,res){",
+              "                        ",
+              "                }); ",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 201\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+              "});",
+              "",
+              "pm.test(\"Test user 'id' field\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData.id, '\"id\" must be above 0 ').to.be.above(0);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"message\": \"{{message}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/comments/{{eventId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "{{eventId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "state not published",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {",
+              "    pm.expect(pm.response.code).to.eql(409);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"message\" : \"{{message}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/comments/{{eventId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "{{eventId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "unexistedEvent",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Status code is 404\", function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"message\" : \"message\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/comments/10001",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "10001"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update comment",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "                let event2 = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/admin/events/' + pm.collectionVariables.get(\"eventId\"),",
+              "                method: 'PATCH',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify({stateAction : 'PUBLISH_EVENT'})",
+              "                }",
+              "                };",
+              "                pm.sendRequest(event2,function(err,res){",
+              "                    let comment = {",
+              "                    url: pm.collectionVariables.get(\"baseUrl\") + '/comments/' + pm.collectionVariables.get(\"eventId\"),",
+              "                    method: 'POST',",
+              "                    header: {",
+              "                        'Content-Type': 'application/json', 'X-Sharer-User-Id' : '' + pm.collectionVariables.get('userId')",
+              "                    },",
+              "                    body: {",
+              "                        mode: 'raw',",
+              "                        raw: JSON.stringify({message : 'new comment'})",
+              "                    }",
+              "                    };",
+              "                    pm.sendRequest(comment,function(err,res){",
+              "                        let jsonData = res.json();",
+              "                        pm.collectionVariables.set('commentId',jsonData.id);",
+              "                    });",
+              "                }); ",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 201\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+              "});",
+              "",
+              "pm.test(\"Test   'message' field\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('comment');",
+              "    pm.expect(jsonData.comment, '\"comment\" must be ' +\"message updated\").to.eql(\"message updated\");",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"message\"  :\"message updated\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/comments/{{commentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "{{commentId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get all event comment",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "                let event2 = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/admin/events/' + pm.collectionVariables.get(\"eventId\"),",
+              "                method: 'PATCH',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify({stateAction : 'PUBLISH_EVENT'})",
+              "                }",
+              "                };",
+              "                pm.sendRequest(event2,function(err,res){",
+              "                    let comment = {",
+              "                    url: pm.collectionVariables.get(\"baseUrl\") + '/comments/' + pm.collectionVariables.get(\"eventId\"),",
+              "                    method: 'POST',",
+              "                    header: {",
+              "                        'Content-Type': 'application/json', 'X-Sharer-User-Id' : '' + pm.collectionVariables.get('userId')",
+              "                    },",
+              "                    body: {",
+              "                        mode: 'raw',",
+              "                        raw: JSON.stringify({message : 'new comment'})",
+              "                    }",
+              "                    };",
+              "                    pm.sendRequest(comment,function(err,res){",
+              "                        let jsonData = res.json();",
+              "                        pm.collectionVariables.set('commentId',jsonData.id);",
+              "                        pm.sendRequest(comment,function(err,res){",
+              "                                ",
+              "                        });",
+              "                    });",
+              "                }); ",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 201\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+              "});",
+              "",
+              "pm.test(\"Array size mast be 2\", function (){",
+              "    pm.expect(pm.response.json().length).to.eql(2);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/comments/event/{{eventId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "event",
+            "{{eventId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get All user comment",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "                let event2 = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/admin/events/' + pm.collectionVariables.get(\"eventId\"),",
+              "                method: 'PATCH',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify({stateAction : 'PUBLISH_EVENT'})",
+              "                }",
+              "                };",
+              "                pm.sendRequest(event2,function(err,res){",
+              "                    let comment = {",
+              "                    url: pm.collectionVariables.get(\"baseUrl\") + '/comments/' + pm.collectionVariables.get(\"eventId\"),",
+              "                    method: 'POST',",
+              "                    header: {",
+              "                        'Content-Type': 'application/json', 'X-Sharer-User-Id' : '' + pm.collectionVariables.get('userId')",
+              "                    },",
+              "                    body: {",
+              "                        mode: 'raw',",
+              "                        raw: JSON.stringify({message : 'new comment'})",
+              "                    }",
+              "                    };",
+              "                    pm.sendRequest(comment,function(err,res){",
+              "                        let jsonData = res.json();",
+              "                        pm.collectionVariables.set('commentId',jsonData.id);",
+              "                        pm.sendRequest(comment,function(err,res){",
+              "                                ",
+              "                        });",
+              "                    });",
+              "                }); ",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 201\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+              "});",
+              "",
+              "pm.test(\"Array size mast be 2\", function (){",
+              "    pm.expect(pm.response.json().length).to.eql(2);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/comments/user/{{userId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "user",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get comment by id",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "                let event2 = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/admin/events/' + pm.collectionVariables.get(\"eventId\"),",
+              "                method: 'PATCH',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify({stateAction : 'PUBLISH_EVENT'})",
+              "                }",
+              "                };",
+              "                pm.sendRequest(event2,function(err,res){",
+              "                    let comment = {",
+              "                    url: pm.collectionVariables.get(\"baseUrl\") + '/comments/' + pm.collectionVariables.get(\"eventId\"),",
+              "                    method: 'POST',",
+              "                    header: {",
+              "                        'Content-Type': 'application/json', 'X-Sharer-User-Id' : '' + pm.collectionVariables.get('userId')",
+              "                    },",
+              "                    body: {",
+              "                        mode: 'raw',",
+              "                        raw: JSON.stringify({message : rnd.getWord(27)})",
+              "                    }",
+              "                    };",
+              "                    pm.sendRequest(comment,function(err,res){",
+              "                        let jsonData = res.json();",
+              "                        pm.collectionVariables.set('commentId',jsonData.id);",
+              "                        pm.collectionVariables.set(\"message\", jsonData.comment);",
+              "                    });",
+              "                }); ",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 201\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+              "});",
+              "",
+              "pm.test(\"Test comment 'id' field\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData.id, '\"id\" must be ' + pm.collectionVariables.get(\"commentId\")).to.equal(pm.collectionVariables.get(\"commentId\"));",
+              "});",
+              "",
+              "pm.test(\"Test   'message' field\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('comment');",
+              "    pm.expect(jsonData.comment, 'comment must be ' + pm.collectionVariables.get(\"message\")).to.eql(pm.collectionVariables.get(\"message\"));",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/comments/{{commentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "{{commentId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete comment",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const rnd = new RandomUtils();",
+              "pm.collectionVariables.set(\"message\", rnd.getWord(30));",
+              "let user = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/users',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getUser())",
+              "    }",
+              "};",
+              "let cat = {",
+              "    url: pm.collectionVariables.get(\"baseUrl\") + '/admin/categories',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json'",
+              "    },",
+              "    body: {",
+              "        mode: 'raw',",
+              "        raw: JSON.stringify(rnd.getCat())",
+              "    }",
+              "};",
+              "",
+              "pm.sendRequest(user, function (err, res){",
+              "        let jsonData = res.json();",
+              "        pm.collectionVariables.set('userId',jsonData.id);",
+              "        pm.sendRequest(cat, function (err, res){",
+              "            let jsonData = res.json();",
+              "            pm.collectionVariables.set('catId',jsonData.id);",
+              "            cat = jsonData.id;",
+              "            let event = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/users/' + pm.collectionVariables.get(\"userId\") + '/events',",
+              "                method: 'POST',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify(rnd.getEvent(cat))",
+              "                }",
+              "            };",
+              "            pm.sendRequest(event, function (err, res){",
+              "                let jsonData = res.json();",
+              "                pm.collectionVariables.set('eventId',jsonData.id);",
+              "                let event2 = {",
+              "                url: pm.collectionVariables.get(\"baseUrl\") + '/admin/events/' + pm.collectionVariables.get(\"eventId\"),",
+              "                method: 'PATCH',",
+              "                header: {",
+              "                    'Content-Type': 'application/json'",
+              "                },",
+              "                body: {",
+              "                    mode: 'raw',",
+              "                    raw: JSON.stringify({stateAction : 'PUBLISH_EVENT'})",
+              "                }",
+              "                };",
+              "                pm.sendRequest(event2,function(err,res){",
+              "                    let comment = {",
+              "                    url: pm.collectionVariables.get(\"baseUrl\") + '/comments/' + pm.collectionVariables.get(\"eventId\"),",
+              "                    method: 'POST',",
+              "                    header: {",
+              "                        'Content-Type': 'application/json', 'X-Sharer-User-Id' : '' + pm.collectionVariables.get('userId')",
+              "                    },",
+              "                    body: {",
+              "                        mode: 'raw',",
+              "                        raw: JSON.stringify({message : rnd.getWord(27)})",
+              "                    }",
+              "                    };",
+              "                    pm.sendRequest(comment,function(err,res){",
+              "                        let jsonData = res.json();",
+              "                        pm.collectionVariables.set('commentId',jsonData.id);",
+              "                        pm.collectionVariables.set(\"message\", jsonData.comment);",
+              "                    });",
+              "                }); ",
+              "            });",
+              "        });",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 204\", function () {",
+              "    pm.expect(pm.response.code).to.eql(204);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-Sharer-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/comments/{{commentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            "{{commentId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "RandomUtils = class {",
+          "    constructor() {}",
+          "    getUser() {",
+          "        return {",
+          "            name: pm.variables.replaceIn('{{$randomFullName}}'),",
+          "            email: pm.variables.replaceIn('{{$randomEmail}}'),",
+          "        };",
+          "    }",
+          "",
+          "    changeState(){",
+          "        return {stateAction : \"PUBLISH_EVENT\"};",
+          "    }",
+          "",
+          "    getCat(){",
+          "        return {",
+          "            name: this.getWord(10)    ",
+          "        };",
+          "    }",
+          "",
+          "    getComp(){",
+          "        return {",
+          "             events : [pm.collectionVariables.get(\"eventId\")],",
+          "             pinned : true,",
+          "             title : this.getWord(20)   ",
+          "        };",
+          "    }",
+          "",
+          "    getWord(length = 1) {",
+          "        let result = '';",
+          "        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';",
+          "        const charactersLength = characters.length;",
+          "        let counter = 0;",
+          "        while (counter < length) {",
+          "            result += characters.charAt(Math.floor(Math.random() * charactersLength));",
+          "            counter += 1;",
+          "        }",
+          "        return result;",
+          "    }",
+          "",
+          "    getEvent(cat){",
+          "        return {",
+          "                annotation: this.getWord(34),",
+          "                category: cat,",
+          "                description: this.getWord(50),",
+          "                eventDate: \"2026-12-31 15:10:05\",",
+          "                location: {",
+          "                        lat: 55.754167,",
+          "                        lon: 37.62",
+          "                        },",
+          "                paid: true,",
+          "                participantLimit: 10,",
+          "                requestModeration: false,",
+          "                title: this.getWord(12)",
+          "        };",
+          "    }",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "catId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "userId2",
+      "value": ""
+    },
+    {
+      "key": "commentId",
+      "value": ""
+    },
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "message",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
