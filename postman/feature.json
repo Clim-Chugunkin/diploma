@@ -1115,12 +1115,11 @@
     },
     {
       "key": "baseUrl",
-      "value": ""
+      "value": "localhost:9090"
     },
     {
       "key": "message",
-      "value": "",
-      "type": "default"
+      "value": ""
     }
   ]
 }
