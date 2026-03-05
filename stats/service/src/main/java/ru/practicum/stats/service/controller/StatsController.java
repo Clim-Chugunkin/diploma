@@ -1,6 +1,7 @@
 package ru.practicum.stats.service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.stats.DTO.StatsHitDTO;
 import ru.practicum.stats.DTO.ViewStats;
@@ -14,6 +15,7 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public StatsHitDTO addEndpoint(@RequestBody StatsHitDTO endpoint) {
         return statsService.addEndpoint(endpoint);
     }
