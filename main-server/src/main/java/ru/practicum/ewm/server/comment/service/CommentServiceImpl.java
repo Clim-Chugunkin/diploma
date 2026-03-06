@@ -83,6 +83,4 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto getById(Long commentId) {
         return commentMapper.toCommentDto(commentRepository.findById(commentId).orElseThrow(() -> new ConditionsNotMetException("такогог комента нет")));
     }
-
-
 }

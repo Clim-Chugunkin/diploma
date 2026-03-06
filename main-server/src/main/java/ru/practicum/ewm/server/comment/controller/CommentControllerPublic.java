@@ -17,26 +17,26 @@ public class CommentControllerPublic {
 
     @PostMapping("/{eventId}")
     @ResponseStatus(HttpStatus.CREATED)
-    CommentDto addComment(@PathVariable(name = "eventId") Long eventId,
-                          @RequestHeader("X-Sharer-User-Id") Long userId,
-                          @RequestBody NewCommentRequest request) {
+    public CommentDto addComment(@PathVariable(name = "eventId") Long eventId,
+                                 @RequestHeader("X-Sharer-User-Id") Long userId,
+                                 @RequestBody NewCommentRequest request) {
         return commentService.addComment(userId, eventId, request);
     }
 
     //get all comments by eventId
     @GetMapping("/event/{eventId}")
-    List<CommentDto> getAllByEventId(@PathVariable(name = "eventId") Long eventId) {
+    public List<CommentDto> getAllByEventId(@PathVariable(name = "eventId") Long eventId) {
         return commentService.getAllByEventId(eventId);
     }
 
     //get all comments by userId
     @GetMapping("/user/{userId}")
-    List<CommentDto> getAllByUserId(@PathVariable Long userId) {
+    public List<CommentDto> getAllByUserId(@PathVariable Long userId) {
         return commentService.getAllByUserId(userId);
     }
 
     @GetMapping("/{commentId}")
-    CommentDto getById(@PathVariable(name = "commentId") Long commentId) {
+    public CommentDto getById(@PathVariable(name = "commentId") Long commentId) {
         return commentService.getById(commentId);
     }
 
